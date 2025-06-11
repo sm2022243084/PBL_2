@@ -4,6 +4,8 @@
 #include <windows.h>
 #include <time.h>
 #include <math.h>
+
+#define BUF_SIZE 16384
 HANDLE hMutex;
 
 int main()
@@ -43,4 +45,9 @@ int main()
     WSACleanup();
 
     return 0;
+}
+
+unsigned WINAPI HandleClient(void* arg){
+	SOCKET clientSock=*((SOCKET*)arg);
+
 }
