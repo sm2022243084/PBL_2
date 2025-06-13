@@ -6,8 +6,10 @@
 #include <math.h>
 
 #define BUF_SIZE 16384
+#define SIZE 256
 HANDLE hMutex;
-
+HANDLE hPipe;
+DWORD WriteByte, ReadByte;
 int main()
 {
     WSADATA wsaData;
@@ -16,7 +18,20 @@ int main()
 	int clientAddrSize;
 	HANDLE hThread;
     
+    
 
+    hPipe = CreateFileA(
+        "\\\\.\\pipe\\NewsPipe",
+        GENERIC_READ | GENERIC_WRITE,
+        0,
+        NULL,
+        OPEN_EXISTING,
+        0,
+        NULL
+    );
+if (hPipe == INVALID_HANDLE_VALUE) {
+        ErrorHandling("Failed to connect to pipe.");
+    }
 
     if(WSAStartup(MAKEWORD(2,2),&wsaData)!=0)
         ErrorHandling("WSAStartup() error!");
@@ -43,11 +58,15 @@ int main()
     }
     closesocket(serverSock);
     WSACleanup();
-
+    CloseHandle(hPipe);
     return 0;
 }
 
 unsigned WINAPI HandleClient(void* arg){
 	SOCKET clientSock=*((SOCKET*)arg);
+    char category[SIZE];
 
+    recv(clientSock,category,sizeof(category),0);
+    WaitForSingleObject(hMutex,INFINITE);
+    writeFile(hPipe,category,strlen(category),&WriteByte, NULL);
 }
