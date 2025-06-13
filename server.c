@@ -5,7 +5,8 @@
 #include <time.h>
 #include <math.h>
 
-#define BUF_SIZE 16384
+#define BUF_SIZE 1024
+#define NEWS_CRAW 16384
 #define SIZE 256
 HANDLE hMutex;
 HANDLE hPipe;
@@ -65,8 +66,9 @@ if (hPipe == INVALID_HANDLE_VALUE) {
 unsigned WINAPI HandleClient(void* arg){
 	SOCKET clientSock=*((SOCKET*)arg);
     char category[SIZE];
-
+    char News_Res[BUF_SIZE];
     recv(clientSock,category,sizeof(category),0);
     WaitForSingleObject(hMutex,INFINITE);
-    writeFile(hPipe,category,strlen(category),&WriteByte, NULL);
+    WriteFile(hPipe,category,strlen(category),&WriteByte, NULL);
+    ReadFile(hPipe,News_Res,sizeof(News_Res)-1,&ReadByte,NULL);
 }
