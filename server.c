@@ -67,8 +67,24 @@ unsigned WINAPI HandleClient(void* arg){
 	SOCKET clientSock=*((SOCKET*)arg);
     char category[SIZE];
     char News_Res[BUF_SIZE];
+    char news_title[15][SIZE];
+    char news_link[15][SIZE];
     recv(clientSock,category,sizeof(category),0);
     WaitForSingleObject(hMutex,INFINITE);
     WriteFile(hPipe,category,strlen(category),&WriteByte, NULL);
     ReadFile(hPipe,News_Res,sizeof(News_Res)-1,&ReadByte,NULL);
+
+    char* line = strtok(News_Res, "\n");
+    for(int i=0;i<15;i++)
+    {
+        strcpy(news_title[i],strtok(line,"|"));
+        strcpy(news_link[i],strtok(NULL,"|"));
+
+        line = strtok(NULL, "\n");
+    }
+
+    for(int i=0;i<15;i++)
+    {
+        send(clientSock,news_title[i],strlen(news_title[i])+1,0);
+    } //이후 밑에는 페이지 또는 기사를 클라이언트에게 입력받고 그에대해 반복 또는 다른 임무 수행 진행
 }
