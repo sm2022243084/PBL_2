@@ -11,9 +11,19 @@
 #define NEWS_CRAW 16384
 #define SIZE 256
 #define TOP_N 5
+
 HANDLE hMutex;
 HANDLE hPipe;
 DWORD WriteByte, ReadByte;
+
+unsigned WINAPI HandleClient(void* arg);
+void API_NEWS(char answer,SOCKET clientSock);
+void Add_Word(NEWS **head, const char *word);
+void Free_List(NEWS *head);
+void Send_Top5_To_Client(NEWS *top5[],SOCKET clientSock);
+void Find_Top5(NEWS *head, NEWS *top5[]);
+void Tokenize_Korean_Words(char *text, NEWS **head);
+void ErrorHandling(const char *msg);
 
 typedef struct NEWS{
     char word[SIZE];
@@ -243,4 +253,11 @@ void Add_Word(NEWS **head, const char *word) {
     new_node->count = 1;
     new_node->next = *head;
     *head = new_node;
+}
+
+void ErrorHandling(const char *msg)
+{
+    fputs(msg, stderr);
+    fputc('\n', stderr);
+    exit(1);
 }
